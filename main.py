@@ -10,6 +10,37 @@ import sys
 import math
 
 
+class Frontier:
+    def __init__(self, initial_state):
+        self.list = []
+        self.set = set()
+
+        self.list.append(initial_state)
+        self.set.add(initial_state.config)
+
+    def add_front(self, state):
+        self.list.insert(0, state)
+        self.set.add(state.config)
+
+    def add_back(self, state):
+        self.list.append(state)
+        self.set.add(state.config)
+
+    def has(self, state):
+        return state.config in self.set
+
+    def pop(self):
+        state = self.list.pop()
+        self.set.remove(state.config)
+        return state
+
+    def len(self):
+        return len(self.list)
+
+    def is_empty(self):
+        return self.len() == 0
+
+
 class PuzzleState(object):
 
     """docstring for PuzzleState"""
@@ -200,7 +231,6 @@ def bfs_search(initial_state):
     while len(frontier) != 0:
         state = frontier.pop()
         print("Dequeued state")
-        state.display()
         explored.add(state)
 
         if test_goal(state):
@@ -221,18 +251,55 @@ def bfs_search(initial_state):
                     isInfrontier = True
                     break
 
+            if isInfrontier:
+                continue
+
             isExplored = False
             for e in explored:
                 if child.isEqual(e):
                     isExplored = True
                     break
 
-            if not isInfrontier and not isExplored:
-                frontier.insert(0, child)
+            if isExplored:
+                continue
+
+            frontier.insert(0, child)
 
 
 def dfs_search(initial_state):
     """DFS search"""
+    frontier = Frontier(initial_state)
+    explored = set()
+
+    # stats
+    expanded = 0
+    max_depth = 0
+    while not frontier.is_empty():
+        state = frontier.pop()
+        explored.add(state.config)
+
+        if test_goal(state):
+            write_output(state, expanded, max_depth)
+            break
+
+        if len(state.children) == 0:
+            children = reversed(state.expand())
+            expanded += 1
+
+        # print("Expanded: %d" % expanded)
+
+        for child in children:
+
+            if frontier.has(child):
+                continue
+
+            if child.config in explored:
+                continue
+
+            if child.cost > max_depth:
+                max_depth = child.cost
+
+            frontier.add_back(child)
 
 
 def A_star_search(initial_state):

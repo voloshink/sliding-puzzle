@@ -221,49 +221,38 @@ def write_output(state, expanded, max_depth):
 def bfs_search(initial_state):
     """BFS search"""
 
-    frontier = []
-    frontier.append(initial_state)
+    frontier = Frontier(initial_state)
     explored = set()
 
     # stats
     expanded = 0
     max_depth = 0
-    while len(frontier) != 0:
+    while not frontier.is_empty():
         state = frontier.pop()
-        print("Dequeued state")
-        explored.add(state)
+        explored.add(state.config)
 
         if test_goal(state):
             write_output(state, expanded, max_depth)
             break
 
         if len(state.children) == 0:
-            children = state.expand()
+            children = reversed(state.expand())
             expanded += 1
 
+        # print("Expanded: %d" % expanded)
+
         for child in children:
+
+            if frontier.has(child):
+                continue
+
+            if child.config in explored:
+                continue
+
             if child.cost > max_depth:
                 max_depth = child.cost
 
-            isInfrontier = False
-            for f in frontier:
-                if child.isEqual(f):
-                    isInfrontier = True
-                    break
-
-            if isInfrontier:
-                continue
-
-            isExplored = False
-            for e in explored:
-                if child.isEqual(e):
-                    isExplored = True
-                    break
-
-            if isExplored:
-                continue
-
-            frontier.insert(0, child)
+            frontier.add_front(child)
 
 
 def dfs_search(initial_state):

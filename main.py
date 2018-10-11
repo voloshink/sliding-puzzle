@@ -207,12 +207,12 @@ def write_output(state, expanded, max_depth):
         path_to_goal.insert(0, temp_state.action)
         temp_state = temp_state.parent
 
-    print(path_to_goal)
-    print(state.cost)
-    print(expanded)
-    print(state.cost)
-    print(max_depth)
-    print(time.time() - start_time)
+    print("path_to_goal:", path_to_goal)
+    print("cost_of_path:", state.cost)
+    print("nodes_expanded:", expanded)
+    print("search_depth:", state.cost)
+    print("max_search_depth:", max_depth)
+    print("running_time:", time.time() - start_time)
     # print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
     return

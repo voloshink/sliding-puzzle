@@ -162,6 +162,11 @@ class PuzzleState(object):
 
         return self.children
 
+    def isEqual(self, state):
+        """comapres two nodes for equality"""
+
+        return self.config == state.config
+
 
 def write_output(state, expanded, max_depth):
 
@@ -210,7 +215,19 @@ def bfs_search(initial_state):
             if child.cost > max_depth:
                 max_depth = child.cost
 
-            if not child in frontier and not child in explored:
+            isInfrontier = False
+            for f in frontier:
+                if child.isEqual(f):
+                    isInfrontier = True
+                    break
+
+            isExplored = False
+            for e in explored:
+                if child.isEqual(e):
+                    isExplored = True
+                    break
+
+            if not isInfrontier and not isExplored:
                 frontier.insert(0, child)
 
 

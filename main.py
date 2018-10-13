@@ -225,13 +225,15 @@ def write_output(state, expanded, max_depth):
         path_to_goal.insert(0, temp_state.action)
         temp_state = temp_state.parent
 
-    print("path_to_goal:", path_to_goal)
-    print("cost_of_path:", state.cost)
-    print("nodes_expanded:", expanded)
-    print("search_depth:", state.cost)
-    print("max_search_depth:", max_depth)
-    print("running_time:", time.time() - start_time)
-    # print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    file = open("output.txt", "w")
+    file.write("path_to_goal: {}\n".format(path_to_goal))
+    file.write("cost_of_path: {}\n".format(state.cost))
+    file.write("nodes_expanded: {}\n".format(expanded))
+    file.write("search_depth: {}\n".format(state.cost))
+    file.write("max_search_depth: {}\n".format(max_depth))
+    file.write("running_time: {}\n".format(time.time() - start_time))
+    # file.write("max_ram_usage: {}\n".format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+    file.close()
 
     return
 
@@ -254,7 +256,7 @@ def bfs_search(initial_state):
             break
 
         if len(state.children) == 0:
-            children = reversed(state.expand())
+            children = state.expand()
             expanded += 1
 
         for child in children:

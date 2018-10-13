@@ -232,7 +232,8 @@ def write_output(state, expanded, max_depth):
     file.write("search_depth: {}\n".format(state.cost))
     file.write("max_search_depth: {}\n".format(max_depth))
     file.write("running_time: {}\n".format(time.time() - start_time))
-    file.write("max_ram_usage: {}\n".format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+    file.write("max_ram_usage: {}\n".format(
+        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
     file.close()
 
     return

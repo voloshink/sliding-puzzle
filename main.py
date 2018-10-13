@@ -26,12 +26,30 @@ class Frontier:
         self.list.append(state)
         self.set.add(state.config)
 
+    def add_weighted(self, state):
+        self.list.append(state)
+        self.set.add(state.config)
+        self.list.sort(key=lambda x: x.total_cost, reverse=True)
+
+    def update_weight(self, state):
+        for lstate in self.list:
+            if lstate.config == state.config:
+                lstate.total_cost = state.total_cost
+                break
+        self.list.sort(key=lambda x: x.total_cost, reverse=True)
+
     def has(self, state):
         return state.config in self.set
 
     def pop(self):
         state = self.list.pop()
         self.set.remove(state.config)
+        return state
+
+    def popLowest(self):
+        state = self.list.pop()
+        self.set.remove(state.config)
+        self.list.sort(key=lambda x: x.total_cost, reverse=True)
         return state
 
     def len(self):
@@ -42,8 +60,6 @@ class Frontier:
 
 
 class PuzzleState(object):
-
-    """docstring for PuzzleState"""
 
     def __init__(self, config, n, parent=None, action="Initial", cost=0):
 
@@ -241,8 +257,6 @@ def bfs_search(initial_state):
             children = reversed(state.expand())
             expanded += 1
 
-        # print("Expanded: %d" % expanded)
-
         for child in children:
 
             if frontier.has(child):
@@ -277,8 +291,6 @@ def dfs_search(initial_state):
             children = reversed(state.expand())
             expanded += 1
 
-        # print("Expanded: %d" % expanded)
-
         for child in children:
 
             if frontier.has(child):
@@ -295,10 +307,43 @@ def dfs_search(initial_state):
 
 def A_star_search(initial_state):
     """A * search"""
+    frontier = Frontier(initial_state)
+    explored = set()
+
+    # stats
+    expanded = 0
+    max_depth = 0
+    while not frontier.is_empty():
+        state = frontier.popLowest()
+        explored.add(state.config)
+
+        if test_goal(state):
+            write_output(state, expanded, max_depth)
+            break
+
+        if len(state.children) == 0:
+            children = reversed(state.expand())
+            expanded += 1
+
+        for child in children:
+            if child.config in explored:
+                continue
+
+            child.total_cost = calculate_total_cost(child)
+
+            if frontier.has(child):
+                frontier.update_weight(child)
+                continue
+
+            if child.cost > max_depth:
+                max_depth = child.cost
+
+            frontier.add_weighted(child)
 
 
 def calculate_total_cost(state):
     """calculate the total estimated cost of a state"""
+    return state.cost + calculate_manhattan_dist(state)
 
 
 def calculate_manhattan_dist(state):

@@ -61,6 +61,8 @@ class PuzzleState(object):
 
         self.dimension = n
 
+        self.total_cost = -1
+
         self.config = config
 
         self.children = []
@@ -299,8 +301,26 @@ def calculate_total_cost(state):
     """calculate the total estimated cost of a state"""
 
 
-def calculate_manhattan_dist(idx, value, n):
-    """calculatet the manhattan distance of a tile"""
+def calculate_manhattan_dist(state):
+    """calculate the manhattan distance of a state"""
+    total = 0
+    for idx, tile in enumerate(state.config):
+        if tile == 0:
+            continue
+        total += calculate_manhattan_dist_tile(tile, idx, state.n)
+
+    return total
+
+
+def calculate_manhattan_dist_tile(tile, position, n):
+    """calculate the manhattan distance of a tile"""
+    current_column = position % n
+    current_row = int(position/n)
+
+    goal_column = tile % n
+    goal_row = int(tile/n)
+
+    return abs(goal_column - current_column) + abs(goal_row - current_row)
 
 
 def test_goal(puzzle_state):
